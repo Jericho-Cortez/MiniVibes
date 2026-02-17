@@ -70,35 +70,62 @@ export class TextureAtlas {
             side: THREE.DoubleSide
         });
 
-        // Try loading an external TNT image to overwrite the TNT atlas slots if present.
-        // Place an image at `assets/tnt.png` to use a custom TNT texture (must be same-origin).
-        try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.src = 'assets/tnt.png';
-            img.onload = () => {
-                // Draw the image into the top/side/bottom positions for TNT if defined
-                const tntIndex = this.getBlockIndex(BlockType.TNT);
-                if (tntIndex >= 0) {
-                    const topIndex = tntIndex * 3;
-                    const sideIndex = tntIndex * 3 + 1;
-                    const bottomIndex = tntIndex * 3 + 2;
-                    const draw = (texIndex) => {
-                        const dx = (texIndex % this.blocksPerRow) * this.textureSize;
-                        const dy = Math.floor(texIndex / this.blocksPerRow) * this.textureSize;
-                        // draw the image scaled to textureSize
-                        ctx.drawImage(img, dx, dy, this.textureSize, this.textureSize);
-                    };
-                    draw(topIndex);
-                    draw(sideIndex);
-                    draw(bottomIndex);
-                    // update texture
-                    if (this.texture) this.texture.needsUpdate = true;
-                }
-            };
-        } catch (e) {
-            // ignore if loading fails
-        }
+        // Load custom TNT texture from asset/macron.png
+        this.loadTNTTexture(canvas, ctx);
+    }
+    
+    /**
+     * Load the macron.png image and paint it on all 3 TNT texture slots (top, side, bottom).
+     * The image is center-cropped to fill each 16x16 cell without distortion,
+     * with contrast/brightness boost for a clean pixel-art look.
+     */
+    loadTNTTexture(canvas, ctx) {
+        const img = new Image();
+        img.src = 'asset/macron.png';
+        img.onload = () => {
+            const tntIndex = this.getBlockIndex(BlockType.TNT);
+            if (tntIndex < 0) return;
+
+            const ts = this.textureSize; // 16
+            const slots = [tntIndex * 3, tntIndex * 3 + 1, tntIndex * 3 + 2]; // top, side, bottom
+
+            // Use an offscreen canvas to process the image once at higher resolution
+            const tmpSize = 64; // intermediate resolution for quality
+            const tmp = document.createElement('canvas');
+            tmp.width = tmpSize;
+            tmp.height = tmpSize;
+            const tctx = tmp.getContext('2d');
+
+            // Center-crop the source image to a square
+            const srcW = img.naturalWidth;
+            const srcH = img.naturalHeight;
+            const cropSide = Math.min(srcW, srcH);
+            const sx = (srcW - cropSide) / 2;
+            const sy = (srcH - cropSide) * 0.15; // bias towards top (face area)
+
+            tctx.drawImage(img, sx, sy, cropSide, cropSide, 0, 0, tmpSize, tmpSize);
+
+            // Boost contrast & brightness for a vibrant look
+            const imgData = tctx.getImageData(0, 0, tmpSize, tmpSize);
+            const d = imgData.data;
+            for (let i = 0; i < d.length; i += 4) {
+                // Increase contrast around midpoint 128
+                d[i]     = Math.min(255, Math.max(0, ((d[i]   - 128) * 1.3 + 128 + 15))); // R
+                d[i + 1] = Math.min(255, Math.max(0, ((d[i+1] - 128) * 1.3 + 128 + 15))); // G
+                d[i + 2] = Math.min(255, Math.max(0, ((d[i+2] - 128) * 1.3 + 128 + 15))); // B
+            }
+            tctx.putImageData(imgData, 0, 0);
+
+            // Draw the processed image into each TNT slot on the atlas
+            for (const texIndex of slots) {
+                const dx = (texIndex % this.blocksPerRow) * ts;
+                const dy = Math.floor(texIndex / this.blocksPerRow) * ts;
+                ctx.drawImage(tmp, 0, 0, tmpSize, tmpSize, dx, dy, ts, ts);
+            }
+
+            // Refresh the GPU texture
+            if (this.texture) this.texture.needsUpdate = true;
+        };
     }
     
     drawBlockTexture(ctx, index, color, blockType, face, topStripeColor = null) {

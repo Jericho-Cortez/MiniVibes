@@ -631,3 +631,9 @@ body {
     background: linear-gradient(to bottom, #8b6c3d 0%, #8b6c3d 50%, #9c7a4a 50%, #9c7a4a 100%);
     border: 1px solid #5a4020;
 }
+
+/* TNT block preview */
+.block-preview.tnt {
+    background: url('../asset/macron.png') center/cover no-repeat;
+    border: 1px solid #cc4400;
+}

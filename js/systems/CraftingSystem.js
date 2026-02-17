@@ -168,10 +168,15 @@ export class CraftingSystem {
         // Close button
         this.closeBtn.addEventListener('click', () => this.close());
         
-        // Close with E or Escape
+        // Open with 0, close with E or Escape
         this.keyHandler = (e) => {
             if (this.isOpen && (e.code === 'KeyE' || e.code === 'Escape')) {
                 this.close();
+                e.preventDefault();
+            }
+            // Open/close with Digit0 or Numpad0
+            if ((e.code === 'Digit0' || e.code === 'Numpad0') && !this.isOpen) {
+                this.open();
                 e.preventDefault();
             }
         };
@@ -245,6 +250,17 @@ export class CraftingSystem {
         // Re-lock pointer
         const canvas = document.getElementById('game-canvas');
         canvas.requestPointerLock();
+    }
+    
+    /**
+     * Toggle crafting table UI
+     */
+    toggle() {
+        if (this.isOpen) {
+            this.close();
+        } else {
+            this.open();
+        }
     }
     
     /**

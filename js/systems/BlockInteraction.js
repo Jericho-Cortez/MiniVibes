@@ -223,22 +223,28 @@ export class BlockInteraction {
         
         // Place block
         const success = this.world.setBlock(placeX, placeY, placeZ, blockType);
-        
+
         if (success) {
             this.placeCooldown = this.cooldownTime;
             // If placed TNT, start fuse and schedule explosion
             if (blockType === BlockType.TNT) {
+                // Joue le son macron-explosion.mp3
+                try {
+                    const audio = new Audio('asset/macron-explosion.mp3');
+                    audio.volume = 1.0;
+                    audio.play();
+                } catch (e) {}
                 // simple visual: keep TNT block in world until explosion
                 // show a 1s warning before explosion
                 const warnDelay = 4000; // ms
                 const explodeDelay = 5000; // ms
 
                 setTimeout(() => {
-                    // show big-message "explosion" for 1s
+                    // show big-message "macron explosion" for 1s
                     try {
                         const msg = document.getElementById('big-message');
                         if (msg) {
-                            msg.textContent = 'explosion';
+                            msg.textContent = 'macron explosion';
                             msg.classList.remove('hidden');
                             setTimeout(() => msg.classList.add('hidden'), 1000);
                         }
@@ -250,7 +256,7 @@ export class BlockInteraction {
                 }, explodeDelay);
             }
         }
-        
+
         return success;
     }
 
