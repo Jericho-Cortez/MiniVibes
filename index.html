@@ -87,6 +87,20 @@
         </div>
     </div>
     
+    <!-- Inventory Overlay (hidden by default) -->
+    <div id="inventory-overlay" class="inventory-overlay hidden">
+        <div class="inventory-container">
+            <h2>Inventaire</h2>
+            <div class="inventory-grid" id="inventory-grid">
+                <!-- 27 slots (3 rows x 9 cols) -->
+            </div>
+            <div class="inventory-hotbar" id="inventory-hotbar">
+                <!-- duplicate hotbar slots for full inventory view (will be populated by Inventory.js) -->
+            </div>
+            <button id="close-inventory">Fermer (E)</button>
+        </div>
+    </div>
+    
     <!-- Import Three.js from CDN -->
     <script type="importmap">
     {

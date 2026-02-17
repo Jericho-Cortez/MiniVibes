@@ -156,16 +156,17 @@ class Game {
     }
     
     update(deltaTime) {
-        // Skip updates if crafting UI is open
+        // Skip updates if crafting UI or inventory UI is open
         const craftingOpen = this.craftingSystem && this.craftingSystem.getIsOpen();
-        
+        const inventoryOpen = this.inventory && this.inventory.getIsOpen && this.inventory.getIsOpen();
+
         // Update player
-        if (!craftingOpen) {
+        if (!craftingOpen && !inventoryOpen) {
             this.player.update(deltaTime);
         }
-        
+
         // Update block interaction
-        if (!craftingOpen) {
+        if (!craftingOpen && !inventoryOpen) {
             this.blockInteraction.update(deltaTime);
         }
         

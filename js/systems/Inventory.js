@@ -26,10 +26,18 @@ export class Inventory {
         // DOM elements
         this.hotbarElement = document.getElementById('hotbar');
         this.slots = this.hotbarElement.querySelectorAll('.hotbar-slot');
+
+        // Inventory overlay elements (full inventory)
+        this.inventoryOverlay = document.getElementById('inventory-overlay');
+        this.inventoryGrid = document.getElementById('inventory-grid');
+        this.inventoryHotbar = document.getElementById('inventory-hotbar');
+        this.closeButton = document.getElementById('close-inventory');
+        this.isOpen = false;
         
         // Bind event handler
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onWheel = this.onWheel.bind(this);
+        this.onCloseClick = this.onCloseClick.bind(this);
         
         // Setup listeners
         this.setupEventListeners();
@@ -39,16 +47,28 @@ export class Inventory {
         
         // Set initial block type
         this.updateBlockInteraction();
+
+        // Build inventory UI slots
+        this.buildInventoryUI();
     }
     
     setupEventListeners() {
         document.addEventListener('keydown', this.onKeyDown);
         document.addEventListener('wheel', this.onWheel);
+        if (this.closeButton) this.closeButton.addEventListener('click', this.onCloseClick);
     }
     
     onKeyDown(event) {
         // Number keys 1-9 select hotbar slots
         const key = event.code;
+
+        // Toggle inventory with E
+        if (key === 'KeyE') {
+            // Prevent default if pointer is locked
+            if (document.pointerLockElement) event.preventDefault();
+            this.toggle();
+            return;
+        }
         
         if (key.startsWith('Digit')) {
             const digit = parseInt(key.replace('Digit', ''));
@@ -142,6 +162,84 @@ export class Inventory {
     dispose() {
         document.removeEventListener('keydown', this.onKeyDown);
         document.removeEventListener('wheel', this.onWheel);
+        if (this.closeButton) this.closeButton.removeEventListener('click', this.onCloseClick);
+    }
+
+    /**
+     * Build inventory UI grid and hotbar copies
+     */
+    buildInventoryUI() {
+        if (!this.inventoryGrid) return;
+
+        // Ensure 27 slots exist
+        this.inventoryGrid.innerHTML = '';
+        for (let i = 0; i < 27; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'inventory-slot';
+            slot.dataset.index = i;
+            this.inventoryGrid.appendChild(slot);
+        }
+
+        // Populate inventory hotbar area (use same structure as main hotbar)
+        if (this.inventoryHotbar) {
+            this.inventoryHotbar.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'hotbar-slot';
+                slot.dataset.slot = (i + 1).toString();
+                const preview = document.createElement('div');
+                preview.className = 'block-preview';
+                slot.appendChild(preview);
+                const num = document.createElement('span');
+                num.className = 'slot-number';
+                num.textContent = (i + 1).toString();
+                slot.appendChild(num);
+                this.inventoryHotbar.appendChild(slot);
+            }
+        }
+    }
+
+    onCloseClick() {
+        this.close();
+    }
+
+    /**
+     * Open inventory: release pointer lock and show overlay
+     */
+    open() {
+        if (this.isOpen) return;
+        this.isOpen = true;
+        if (this.inventoryOverlay) this.inventoryOverlay.classList.remove('hidden');
+
+        // Release pointer lock so user can use mouse to click UI
+        try {
+            const player = window.game && window.game.player;
+            if (player && player.getControls) player.getControls().unlock();
+            else if (document.exitPointerLock) document.exitPointerLock();
+        } catch (e) {}
+    }
+
+    /**
+     * Close inventory: request pointer lock and hide overlay
+     */
+    close() {
+        if (!this.isOpen) return;
+        this.isOpen = false;
+        if (this.inventoryOverlay) this.inventoryOverlay.classList.add('hidden');
+
+        // Re-lock pointer to resume playing
+        try {
+            const player = window.game && window.game.player;
+            if (player && player.lock) player.lock();
+        } catch (e) {}
+    }
+
+    toggle() {
+        if (this.isOpen) this.close(); else this.open();
+    }
+
+    getIsOpen() {
+        return !!this.isOpen;
     }
 }
 
