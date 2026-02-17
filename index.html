@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniVibes - Voxel Sandbox</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- UI Overlay -->
+        <div id="ui-overlay">
+            <!-- Crosshair -->
+            <div id="crosshair">+</div>
+            
+            <!-- Hotbar -->
+            <div id="hotbar">
+                <div class="hotbar-slot selected" data-slot="1">
+                    <div class="block-preview grass"></div>
+                    <span class="slot-number">1</span>
+                </div>
+                <div class="hotbar-slot" data-slot="2">
+                    <div class="block-preview dirt"></div>
+                    <span class="slot-number">2</span>
+                </div>
+                <div class="hotbar-slot" data-slot="3">
+                    <div class="block-preview stone"></div>
+                    <span class="slot-number">3</span>
+                </div>
+                <div class="hotbar-slot" data-slot="4">
+                    <div class="block-preview wood"></div>
+                    <span class="slot-number">4</span>
+                </div>
+                <div class="hotbar-slot" data-slot="5">
+                    <div class="block-preview leaves"></div>
+                    <span class="slot-number">5</span>
+                </div>
+                <div class="hotbar-slot" data-slot="6">
+                    <div class="block-preview sand"></div>
+                    <span class="slot-number">6</span>
+                </div>
+                <div class="hotbar-slot" data-slot="7">
+                    <div class="block-preview cobblestone"></div>
+                    <span class="slot-number">7</span>
+                </div>
+                <div class="hotbar-slot" data-slot="8">
+                    <div class="block-preview planks"></div>
+                    <span class="slot-number">8</span>
+                </div>
+                <div class="hotbar-slot" data-slot="9">
+                    <div class="block-preview glass"></div>
+                    <span class="slot-number">9</span>
+                </div>
+            </div>
+            
+            <!-- Debug Info -->
+            <div id="debug-info">
+                <div id="fps">FPS: 0</div>
+                <div id="position">Pos: 0, 0, 0</div>
+                <div id="chunks">Chunks: 0</div>
+                <div id="time">Time: 12:00</div>
+            </div>
+        </div>
+        
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <h1>🎮 MiniVibes</h1>
+            <p>Un jeu sandbox voxel en 3D</p>
+            <button id="start-button">Cliquez pour jouer</button>
+            <div class="controls-info">
+                <h3>Contrôles</h3>
+                <p><strong>WASD</strong> - Se déplacer</p>
+                <p><strong>Espace</strong> - Sauter</p>
+                <p><strong>Souris</strong> - Regarder</p>
+                <p><strong>Clic gauche</strong> - Détruire bloc</p>
+                <p><strong>Clic droit</strong> - Placer bloc</p>
+                <p><strong>1-9</strong> - Sélectionner bloc</p>
+                <p><strong>Échap</strong> - Libérer souris</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import Three.js from CDN -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+        }
+    }
+    </script>
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
