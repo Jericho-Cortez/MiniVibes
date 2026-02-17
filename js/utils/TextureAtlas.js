@@ -69,6 +69,36 @@ export class TextureAtlas {
             opacity: 0.8,
             side: THREE.DoubleSide
         });
+
+        // Try loading an external TNT image to overwrite the TNT atlas slots if present.
+        // Place an image at `assets/tnt.png` to use a custom TNT texture (must be same-origin).
+        try {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.src = 'assets/tnt.png';
+            img.onload = () => {
+                // Draw the image into the top/side/bottom positions for TNT if defined
+                const tntIndex = this.getBlockIndex(BlockType.TNT);
+                if (tntIndex >= 0) {
+                    const topIndex = tntIndex * 3;
+                    const sideIndex = tntIndex * 3 + 1;
+                    const bottomIndex = tntIndex * 3 + 2;
+                    const draw = (texIndex) => {
+                        const dx = (texIndex % this.blocksPerRow) * this.textureSize;
+                        const dy = Math.floor(texIndex / this.blocksPerRow) * this.textureSize;
+                        // draw the image scaled to textureSize
+                        ctx.drawImage(img, dx, dy, this.textureSize, this.textureSize);
+                    };
+                    draw(topIndex);
+                    draw(sideIndex);
+                    draw(bottomIndex);
+                    // update texture
+                    if (this.texture) this.texture.needsUpdate = true;
+                }
+            };
+        } catch (e) {
+            // ignore if loading fails
+        }
     }
     
     drawBlockTexture(ctx, index, color, blockType, face, topStripeColor = null) {

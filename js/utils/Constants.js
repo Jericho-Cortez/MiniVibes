@@ -21,7 +21,8 @@ export const BlockType = {
     COBBLESTONE: 8,
     PLANKS: 9,
     GLASS: 10,
-    CRAFTING_TABLE: 11
+    CRAFTING_TABLE: 11,
+    TNT: 12
 };
 
 // Mob types
@@ -63,7 +64,8 @@ export const BlockProperties = {
     [BlockType.COBBLESTONE]: { name: 'Cobblestone', solid: true, transparent: false },
     [BlockType.PLANKS]: { name: 'Planks', solid: true, transparent: false },
     [BlockType.GLASS]: { name: 'Glass', solid: true, transparent: true },
-    [BlockType.CRAFTING_TABLE]: { name: 'Crafting Table', solid: true, transparent: false, interactable: true }
+    [BlockType.CRAFTING_TABLE]: { name: 'Crafting Table', solid: true, transparent: false, interactable: true },
+    [BlockType.TNT]: { name: 'TNT', solid: true, transparent: false }
 };
 
 // Block colors (RGB values for texture generation)
@@ -79,6 +81,8 @@ export const BlockColors = {
     [BlockType.PLANKS]: { top: 0xc4a663, side: 0xc4a663, bottom: 0xc4a663 },
     [BlockType.GLASS]: { top: 0xc8e6ff, side: 0xc8e6ff, bottom: 0xc8e6ff },
     [BlockType.CRAFTING_TABLE]: { top: 0x8b6c3d, side: 0x9c7a4a, bottom: 0x6b4423 }
+    ,
+    [BlockType.TNT]: { top: 0xff5500, side: 0xff7700, bottom: 0x8b2b00 }
 };
 
 // Player settings

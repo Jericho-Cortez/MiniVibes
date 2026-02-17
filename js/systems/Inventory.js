@@ -17,7 +17,7 @@ export class Inventory {
             BlockType.SAND,            // Slot 6
             BlockType.COBBLESTONE,     // Slot 7
             BlockType.PLANKS,          // Slot 8
-            BlockType.CRAFTING_TABLE   // Slot 9
+            BlockType.TNT             // Slot 9 (TNT)
         ];
         
         // Currently selected slot (0-8)

@@ -226,9 +226,61 @@ export class BlockInteraction {
         
         if (success) {
             this.placeCooldown = this.cooldownTime;
+            // If placed TNT, start fuse and schedule explosion
+            if (blockType === BlockType.TNT) {
+                // simple visual: keep TNT block in world until explosion
+                // show a 1s warning before explosion
+                const warnDelay = 4000; // ms
+                const explodeDelay = 5000; // ms
+
+                setTimeout(() => {
+                    // show big-message "explosion" for 1s
+                    try {
+                        const msg = document.getElementById('big-message');
+                        if (msg) {
+                            msg.textContent = 'explosion';
+                            msg.classList.remove('hidden');
+                            setTimeout(() => msg.classList.add('hidden'), 1000);
+                        }
+                    } catch (e) {}
+                }, warnDelay);
+
+                setTimeout(() => {
+                    this.explodeTNT(placeX, placeY, placeZ);
+                }, explodeDelay);
+            }
         }
         
         return success;
+    }
+
+    /**
+     * Explode TNT at given coordinates, removing blocks in radius
+     */
+    explodeTNT(cx, cy, cz) {
+        const radius = 2; // explosion radius in blocks
+
+        // Remove the TNT block itself first
+        try { this.world.setBlock(cx, cy, cz, BlockType.AIR); } catch (e) {}
+
+        for (let x = cx - radius; x <= cx + radius; x++) {
+            for (let y = cy - radius; y <= cy + radius; y++) {
+                for (let z = cz - radius; z <= cz + radius; z++) {
+                    // distance check for roughly spherical blast
+                    const dx = x - cx;
+                    const dy = y - cy;
+                    const dz = z - cz;
+                    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                    if (dist <= radius + 0.001) {
+                        const bt = this.world.getBlock(x, y, z);
+                        // Do not destroy bedrock
+                        if (bt !== undefined && bt !== BlockType.BEDROCK) {
+                            this.world.setBlock(x, y, z, BlockType.AIR);
+                        }
+                    }
+                }
+            }
+        }
     }
     
     /**

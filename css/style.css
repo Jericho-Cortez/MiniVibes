@@ -320,6 +320,23 @@ body {
     cursor: pointer;
 }
 
+/* Fullscreen big message (explosion warning) */
+.big-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    color: #ff3333;
+    font-size: 72px;
+    font-weight: 800;
+    text-shadow: 0 0 20px rgba(0,0,0,0.7);
+    pointer-events: none;
+    background: rgba(0,0,0,0.2);
+    padding: 20px 40px;
+    border-radius: 8px;
+}
+
 /* Loading indicator */
 .loading {
     position: fixed;
