@@ -4,6 +4,8 @@ import { Player } from './player/Player.js';
 import { BlockInteraction } from './systems/BlockInteraction.js';
 import { Inventory } from './systems/Inventory.js';
 import { Environment } from './systems/Environment.js';
+import { MobManager } from './entities/MobManager.js';
+import { CraftingSystem } from './systems/CraftingSystem.js';
 
 /**
  * MiniVibes - Main game class
@@ -114,6 +116,17 @@ class Game {
         // Initialize environment
         this.environment = new Environment(this.scene);
         
+        // Initialize mob manager
+        this.mobManager = new MobManager(this.world, this.scene);
+        this.mobManager.spawnInitialMobs(spawnPosition);
+        
+        // Initialize crafting system
+        this.craftingSystem = new CraftingSystem(this.world, this.player);
+        
+        // Connect systems
+        this.blockInteraction.mobManager = this.mobManager;
+        this.blockInteraction.craftingSystem = this.craftingSystem;
+        
         // Start game loop
         this.isRunning = true;
         this.lastTime = performance.now();
@@ -143,14 +156,30 @@ class Game {
     }
     
     update(deltaTime) {
+        // Skip updates if crafting UI is open
+        const craftingOpen = this.craftingSystem && this.craftingSystem.getIsOpen();
+        
         // Update player
-        this.player.update(deltaTime);
+        if (!craftingOpen) {
+            this.player.update(deltaTime);
+        }
         
         // Update block interaction
-        this.blockInteraction.update(deltaTime);
+        if (!craftingOpen) {
+            this.blockInteraction.update(deltaTime);
+        }
         
         // Update environment (day/night cycle)
         this.environment.update(deltaTime);
+        
+        // Update mobs
+        if (this.mobManager) {
+            this.mobManager.update(
+                deltaTime,
+                this.player.getPosition(),
+                this.environment.isNight()
+            );
+        }
         
         // Clear just pressed states
         this.player.clearJustPressed();
@@ -183,6 +212,15 @@ class Game {
         
         // Update time
         this.timeElement.textContent = `Time: ${this.environment.getTimeString()}`;
+        
+        // Update mob count
+        const mobCount = this.mobManager ? this.mobManager.getMobCount() : 0;
+        if (!this.mobsElement) {
+            this.mobsElement = document.getElementById('mobs');
+        }
+        if (this.mobsElement) {
+            this.mobsElement.textContent = `Mobs: ${mobCount}`;
+        }
     }
     
     /**
@@ -201,6 +239,14 @@ class Game {
         
         if (this.inventory) {
             this.inventory.dispose();
+        }
+        
+        if (this.mobManager) {
+            this.mobManager.dispose();
+        }
+        
+        if (this.craftingSystem) {
+            this.craftingSystem.dispose();
         }
     }
 }

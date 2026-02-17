@@ -25,6 +25,10 @@ export class BlockInteraction {
         // Current target
         this.targetBlock = null;
         this.targetFace = null;
+        
+        // External references (set later)
+        this.mobManager = null;
+        this.craftingSystem = null;
     }
     
     /**
@@ -61,10 +65,34 @@ export class BlockInteraction {
         const controls = this.player.getControls();
         
         if (controls.mouse.leftJustPressed && this.destroyCooldown === 0) {
-            this.destroyBlock();
+            // Try hitting mob first
+            let hitMob = false;
+            if (this.mobManager) {
+                const eyePos = this.player.getEyePosition();
+                const dir = this.player.getLookDirection();
+                const mob = this.mobManager.getMobAtRay(eyePos, dir);
+                if (mob) {
+                    mob.takeDamage(3);
+                    hitMob = true;
+                    this.destroyCooldown = this.cooldownTime;
+                }
+            }
+            if (!hitMob) {
+                this.destroyBlock();
+            }
         }
         
         if (controls.mouse.rightJustPressed && this.placeCooldown === 0) {
+            // Check if targeting crafting table
+            if (this.targetBlock && this.craftingSystem) {
+                const { x, y, z } = this.targetBlock;
+                const blockType = this.world.getBlock(x, y, z);
+                if (blockType === BlockType.CRAFTING_TABLE) {
+                    this.craftingSystem.open();
+                    this.placeCooldown = this.cooldownTime;
+                    return;
+                }
+            }
             this.placeBlock();
         }
     }

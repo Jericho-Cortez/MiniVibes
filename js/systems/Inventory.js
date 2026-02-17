@@ -9,15 +9,15 @@ export class Inventory {
         
         // Hotbar slots (1-9)
         this.hotbar = [
-            BlockType.GRASS,       // Slot 1
-            BlockType.DIRT,        // Slot 2
-            BlockType.STONE,       // Slot 3
-            BlockType.WOOD,        // Slot 4
-            BlockType.LEAVES,      // Slot 5
-            BlockType.SAND,        // Slot 6
-            BlockType.COBBLESTONE, // Slot 7
-            BlockType.PLANKS,      // Slot 8
-            BlockType.GLASS        // Slot 9
+            BlockType.GRASS,           // Slot 1
+            BlockType.DIRT,            // Slot 2
+            BlockType.STONE,           // Slot 3
+            BlockType.WOOD,            // Slot 4
+            BlockType.LEAVES,          // Slot 5
+            BlockType.SAND,            // Slot 6
+            BlockType.COBBLESTONE,     // Slot 7
+            BlockType.PLANKS,          // Slot 8
+            BlockType.CRAFTING_TABLE   // Slot 9
         ];
         
         // Currently selected slot (0-8)

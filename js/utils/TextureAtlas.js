@@ -175,6 +175,41 @@ export class TextureAtlas {
             case BlockType.BEDROCK:
                 this.addNoise(ctx, x, y, size, size, r, g, b, 30);
                 break;
+                
+            case BlockType.CRAFTING_TABLE:
+                if (face === 'top') {
+                    // Grid pattern on top
+                    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                    ctx.fillRect(x, y, size, size);
+                    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+                    ctx.lineWidth = 1;
+                    // Draw 3x3 grid
+                    for (let i = 1; i < 3; i++) {
+                        ctx.beginPath();
+                        ctx.moveTo(x + (size / 3) * i, y + 1);
+                        ctx.lineTo(x + (size / 3) * i, y + size - 1);
+                        ctx.moveTo(x + 1, y + (size / 3) * i);
+                        ctx.lineTo(x + size - 1, y + (size / 3) * i);
+                        ctx.stroke();
+                    }
+                    // Border
+                    ctx.strokeStyle = 'rgba(80,50,20,0.8)';
+                    ctx.strokeRect(x + 0.5, y + 0.5, size - 1, size - 1);
+                } else if (face === 'side') {
+                    // Tools on side
+                    this.addNoise(ctx, x, y, size, size, r, g, b, 15);
+                    // Saw pattern
+                    ctx.fillStyle = 'rgba(60,60,60,0.6)';
+                    ctx.fillRect(x + 3, y + 3, 2, 10);
+                    ctx.fillRect(x + 6, y + 5, 6, 2);
+                    // Hammer
+                    ctx.fillStyle = 'rgba(100,100,100,0.5)';
+                    ctx.fillRect(x + 10, y + 3, 2, 8);
+                    ctx.fillRect(x + 8, y + 3, 6, 3);
+                } else {
+                    this.addNoise(ctx, x, y, size, size, r, g, b, 20);
+                }
+                break;
         }
     }
     
