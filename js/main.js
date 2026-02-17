@@ -221,6 +221,24 @@ class Game {
         if (this.mobsElement) {
             this.mobsElement.textContent = `Mobs: ${mobCount}`;
         }
+
+        // Fly indicator (shows when player is flying)
+        let flyEl = document.getElementById('fly-indicator');
+        if (!flyEl) {
+            flyEl = document.createElement('div');
+            flyEl.id = 'fly-indicator';
+            flyEl.className = 'hidden';
+            const debug = document.getElementById('debug-info') || document.getElementById('ui-overlay');
+            if (debug) debug.appendChild(flyEl);
+        }
+
+        const isFlying = this.player && this.player.physics && this.player.physics.isFlying;
+        if (isFlying) {
+            flyEl.textContent = 'Fly: ON';
+            flyEl.classList.remove('hidden');
+        } else {
+            flyEl.classList.add('hidden');
+        }
     }
     
     /**

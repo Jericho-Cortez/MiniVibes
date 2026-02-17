@@ -5,6 +5,7 @@ import {
     PLAYER_EYE_HEIGHT, 
     PLAYER_SPEED, 
     PLAYER_JUMP_VELOCITY,
+    PLAYER_FLY_SPEED,
     GRAVITY,
     TERMINAL_VELOCITY
 } from '../utils/Constants.js';
@@ -20,6 +21,9 @@ export class Physics {
         this.velocity = new THREE.Vector3();
         this.acceleration = new THREE.Vector3(0, -GRAVITY, 0);
         
+        // Flying state
+        this.isFlying = false;
+
         this.isOnGround = false;
         this.wasOnGround = false;
     }
@@ -27,7 +31,7 @@ export class Physics {
     /**
      * Update physics for the player
      */
-    update(position, movement, deltaTime, isJumping) {
+    update(position, movement, deltaTime, isJumping, vertical = 0) {
         const dt = Math.min(deltaTime, 0.1); // Cap delta time to prevent tunneling
         
         // Store previous ground state
@@ -36,17 +40,22 @@ export class Physics {
         // Apply movement input
         this.velocity.x = movement.x * PLAYER_SPEED;
         this.velocity.z = movement.z * PLAYER_SPEED;
-        
-        // Apply gravity
-        if (!this.isOnGround) {
-            this.velocity.y += this.acceleration.y * dt;
-            this.velocity.y = Math.max(this.velocity.y, -TERMINAL_VELOCITY);
-        }
-        
-        // Handle jumping
-        if (isJumping && this.isOnGround) {
-            this.velocity.y = PLAYER_JUMP_VELOCITY;
-            this.isOnGround = false;
+
+        // Flying mode: override vertical movement and ignore gravity
+        if (this.isFlying) {
+            this.velocity.y = vertical * PLAYER_FLY_SPEED;
+        } else {
+            // Apply gravity
+            if (!this.isOnGround) {
+                this.velocity.y += this.acceleration.y * dt;
+                this.velocity.y = Math.max(this.velocity.y, -TERMINAL_VELOCITY);
+            }
+
+            // Handle jumping
+            if (isJumping && this.isOnGround) {
+                this.velocity.y = PLAYER_JUMP_VELOCITY;
+                this.isOnGround = false;
+            }
         }
         
         // Calculate new position
@@ -93,6 +102,21 @@ export class Physics {
         }
         
         return newPosition;
+    }
+
+    /**
+     * Enable or disable flying
+     */
+    setFlying(enabled) {
+        this.isFlying = !!enabled;
+        if (this.isFlying) {
+            // prevent fall damage / velocity when entering fly
+            this.velocity.y = 0;
+        }
+    }
+
+    toggleFlying() {
+        this.setFlying(!this.isFlying);
     }
     
     /**

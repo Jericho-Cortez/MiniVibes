@@ -17,6 +17,10 @@ export class Player {
         // Initialize subsystems
         this.controls = new Controls(camera, domElement);
         this.physics = new Physics(world);
+
+        // Game mode: 0 will enable double-space fly toggle behavior
+        this.gameMode = 0; // default set to 0 per user request
+        this.allowFlyToggleInGameMode0 = true;
         
         // Update camera position
         this.updateCamera();
@@ -41,13 +45,21 @@ export class Player {
         // Get movement input
         const movement = this.controls.getMovementDirection();
         const isJumping = this.controls.isJumping();
+        const vertical = this.controls.getVerticalInput();
+        const flyToggle = this.controls.consumeFlyToggle();
+
+        // Handle double-space fly toggle when gamemode 0
+        if (flyToggle && this.gameMode === 0 && this.allowFlyToggleInGameMode0) {
+            this.physics.toggleFlying();
+        }
         
         // Update physics
         this.position = this.physics.update(
             this.position,
             movement,
             deltaTime,
-            isJumping
+            isJumping,
+            vertical
         );
         
         // Update camera position
@@ -55,6 +67,17 @@ export class Player {
         
         // Update world based on player position
         this.world.update(this.position);
+    }
+
+    /**
+     * Set game mode. Use 0 to enable double-space fly toggle behavior.
+     */
+    setGameMode(mode) {
+        this.gameMode = mode;
+        // If switching out of gamemode 0, ensure flying is disabled
+        if (mode !== 0) {
+            this.physics.setFlying(false);
+        }
     }
     
     /**

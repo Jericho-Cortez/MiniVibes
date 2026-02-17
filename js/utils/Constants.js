@@ -89,6 +89,7 @@ export const PLAYER_SPEED = 5;
 export const PLAYER_JUMP_VELOCITY = 8;
 export const GRAVITY = 25;
 export const TERMINAL_VELOCITY = 50;
+export const PLAYER_FLY_SPEED = 7;
 
 // Mouse settings
 export const MOUSE_SENSITIVITY = 0.002;

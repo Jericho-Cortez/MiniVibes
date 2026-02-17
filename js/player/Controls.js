@@ -23,7 +23,8 @@ export class Controls {
             backward: false,
             left: false,
             right: false,
-            jump: false
+            jump: false,
+            crouch: false
         };
         
         // Mouse buttons
@@ -45,6 +46,10 @@ export class Controls {
         
         // Setup listeners
         this.setupEventListeners();
+
+        // Double-space detection for fly toggle
+        this.lastSpaceTime = 0;
+        this.flyToggleRequested = false;
     }
     
     setupEventListeners() {
@@ -134,8 +139,21 @@ export class Controls {
                 this.keys.right = true;
                 break;
             case 'Space':
+                // Double-tap detection (300ms threshold)
+                const now = Date.now();
+                if (now - this.lastSpaceTime < 300) {
+                    this.flyToggleRequested = true;
+                    this.lastSpaceTime = 0;
+                } else {
+                    this.lastSpaceTime = now;
+                }
+
                 this.keys.jump = true;
                 event.preventDefault();
+                break;
+            case 'ShiftLeft':
+            case 'ShiftRight':
+                this.keys.crouch = true;
                 break;
         }
     }
@@ -160,6 +178,10 @@ export class Controls {
                 break;
             case 'Space':
                 this.keys.jump = false;
+                break;
+            case 'ShiftLeft':
+            case 'ShiftRight':
+                this.keys.crouch = false;
                 break;
         }
     }
@@ -242,6 +264,24 @@ export class Controls {
     clearJustPressed() {
         this.mouse.leftJustPressed = false;
         this.mouse.rightJustPressed = false;
+    }
+
+    /**
+     * Consume and return whether a fly toggle was requested (double-space)
+     */
+    consumeFlyToggle() {
+        const val = this.flyToggleRequested;
+        this.flyToggleRequested = false;
+        return val;
+    }
+
+    /**
+     * Returns vertical input for flying: 1 = ascend, -1 = descend, 0 = none
+     */
+    getVerticalInput() {
+        const up = this.keys.jump ? 1 : 0;
+        const down = this.keys.crouch ? 1 : 0;
+        return up - down;
     }
     
     /**
